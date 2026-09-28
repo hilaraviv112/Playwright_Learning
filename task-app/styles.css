@@ -70,6 +70,7 @@ body {
   line-height: 1.5;
   background: var(--bg);
   color: var(--text);
+  padding-bottom: 72px; /* מקום לכפתור ערכת הנושא */
 }
 
 [hidden] { display: none !important; }
@@ -112,6 +113,27 @@ input.invalid { border-color: var(--danger); }
 .btn.danger-solid { background: var(--danger); color: var(--card); font-weight: 600; }
 .confirm-text { align-self: center; color: var(--danger); font-weight: 600; font-size: 0.9rem; }
 .btn.danger { color: var(--danger); }
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle {
+  position: fixed;
+  bottom: 16px;
+  inset-inline-end: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.theme-toggle:hover { background: var(--hover); }
+.theme-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.theme-icon { line-height: 1; }
 
 /* ---------- Auth ---------- */
 .auth-view {
@@ -205,4 +227,6 @@ input.invalid { border-color: var(--danger); }
   .task { flex-wrap: wrap; }
   .task .body { flex: 1 1 calc(100% - 40px); }
   .task .actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+  .theme-label { display: none; }
+  .theme-toggle { padding: 10px; }
 }

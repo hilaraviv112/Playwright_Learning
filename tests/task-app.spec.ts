@@ -146,3 +146,44 @@ test.describe('Task App - משימות', () => {
     await expect(page.locator(tid('task-title-text'))).toHaveText(['משימה שנשמרת']);
   });
 });
+
+test.describe('Task App - מצב כהה', () => {
+  test('הכפתור מחליף בין מצב כהה לבהיר', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto(APP_URL);
+    const toggle = page.locator(tid('theme-toggle'));
+    const html = page.locator('html');
+
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toContainText('מצב כהה');
+
+    await toggle.click();
+    await expect(html).toHaveAttribute('data-theme', 'dark');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toContainText('מצב בהיר');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(17, 20, 29)');
+
+    await toggle.click();
+    await expect(html).toHaveAttribute('data-theme', 'light');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(238, 241, 247)');
+  });
+
+  test('הבחירה נשמרת אחרי רענון ובמסך המשימות', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await register(page);
+    await page.locator(tid('theme-toggle')).click();
+    await page.reload();
+
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator(tid('theme-toggle'))).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator(tid('tasks-view'))).toBeVisible();
+  });
+
+  test('ברירת המחדל עוקבת אחרי הגדרת המערכת', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto(APP_URL);
+    await expect(page.locator(tid('theme-toggle'))).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(17, 20, 29)');
+  });
+});

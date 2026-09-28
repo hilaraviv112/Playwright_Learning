@@ -87,6 +87,37 @@ function setFieldError(input, message) {
 }
 
 /* =========================================================
+ * מצב כהה / בהיר
+ * ========================================================= */
+const THEME_KEY = 'tm_theme';
+const themeToggle = document.getElementById('theme-toggle');
+const darkQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+
+const isDark = () => {
+  const theme = document.documentElement.dataset.theme;
+  return theme ? theme === 'dark' : Boolean(darkQuery?.matches);
+};
+
+function updateThemeToggle() {
+  const dark = isDark();
+  themeToggle.setAttribute('aria-pressed', String(dark));
+  themeToggle.setAttribute('aria-label', dark ? 'מעבר למצב בהיר' : 'מעבר למצב כהה');
+  themeToggle.querySelector('.theme-icon').textContent = dark ? '☀️' : '🌙';
+  themeToggle.querySelector('.theme-label').textContent = dark ? 'מצב בהיר' : 'מצב כהה';
+}
+
+themeToggle.addEventListener('click', () => {
+  const theme = isDark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = theme;
+  setItem(THEME_KEY, theme);
+  updateThemeToggle();
+});
+
+// כל עוד המשתמש לא בחר ידנית — עוקבים אחרי הגדרת המערכת
+darkQuery?.addEventListener?.('change', updateThemeToggle);
+updateThemeToggle();
+
+/* =========================================================
  * ניווט בין מסכים
  * ========================================================= */
 const views = {

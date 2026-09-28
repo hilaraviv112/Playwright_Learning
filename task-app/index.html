@@ -8,8 +8,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    // החלת ערכת הנושא השמורה לפני הציור הראשון, כדי למנוע הבהוב
+    try {
+      const theme = localStorage.getItem('tm_theme');
+      if (theme === 'dark' || theme === 'light') document.documentElement.dataset.theme = theme;
+    } catch {}
+  </script>
 </head>
 <body>
+  <button type="button" class="theme-toggle" id="theme-toggle" data-test="theme-toggle" aria-pressed="false">
+    <span class="theme-icon" aria-hidden="true">🌙</span>
+    <span class="theme-label">מצב כהה</span>
+  </button>
+
   <!-- ===== מסך התחברות ===== -->
   <section id="login-view" class="auth-view" data-test="login-view" hidden>
     <form id="login-form" class="card auth-card" novalidate>
