@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ניהול משימות</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===== מסך התחברות ===== -->
+  <section id="login-view" class="auth-view" data-test="login-view" hidden>
+    <form id="login-form" class="card auth-card" novalidate>
+      <h1>התחברות</h1>
+
+      <label for="login-email">אימייל</label>
+      <input id="login-email" name="email" type="email" placeholder="name@example.com" autocomplete="email" data-test="login-email" />
+      <p class="field-error" data-test="login-email-error"></p>
+
+      <label for="login-password">סיסמה</label>
+      <input id="login-password" name="password" type="password" placeholder="סיסמה" autocomplete="current-password" data-test="login-password" />
+      <p class="field-error" data-test="login-password-error"></p>
+
+      <p class="form-error" role="alert" data-test="login-error"></p>
+
+      <button type="submit" class="btn primary" data-test="login-button">התחבר</button>
+      <p class="switch">אין לך חשבון? <a href="#register" data-test="go-to-register">להרשמה</a></p>
+    </form>
+  </section>
+
+  <!-- ===== מסך הרשמה ===== -->
+  <section id="register-view" class="auth-view" data-test="register-view" hidden>
+    <form id="register-form" class="card auth-card" novalidate>
+      <h1>הרשמה</h1>
+
+      <label for="register-name">שם מלא</label>
+      <input id="register-name" name="name" type="text" placeholder="שם מלא" autocomplete="name" data-test="register-name" />
+      <p class="field-error" data-test="register-name-error"></p>
+
+      <label for="register-email">אימייל</label>
+      <input id="register-email" name="email" type="email" placeholder="name@example.com" autocomplete="email" data-test="register-email" />
+      <p class="field-error" data-test="register-email-error"></p>
+
+      <label for="register-password">סיסמה</label>
+      <input id="register-password" name="password" type="password" placeholder="סיסמה" autocomplete="new-password" data-test="register-password" />
+      <ul class="password-rules" data-test="password-rules">
+        <li data-rule="length">לפחות 8 תווים</li>
+        <li data-rule="upper">אות גדולה באנגלית (A-Z)</li>
+        <li data-rule="lower">אות קטנה באנגלית (a-z)</li>
+        <li data-rule="digit">ספרה (0-9)</li>
+        <li data-rule="special">תו מיוחד (!@#$%...)</li>
+      </ul>
+      <p class="field-error" data-test="register-password-error"></p>
+
+      <label for="register-confirm">אימות סיסמה</label>
+      <input id="register-confirm" name="confirm" type="password" placeholder="הקלד שוב את הסיסמה" autocomplete="new-password" data-test="register-confirm" />
+      <p class="field-error" data-test="register-confirm-error"></p>
+
+      <p class="form-error" role="alert" data-test="register-error"></p>
+
+      <button type="submit" class="btn primary" data-test="register-button">הירשם</button>
+      <p class="switch">כבר רשום? <a href="#login" data-test="go-to-login">להתחברות</a></p>
+    </form>
+  </section>
+
+  <!-- ===== מסך משימות ===== -->
+  <section id="tasks-view" data-test="tasks-view" hidden>
+    <header class="topbar">
+      <h1>המשימות שלי</h1>
+      <div class="user">
+        <span data-test="welcome"></span>
+        <button type="button" class="btn ghost" id="logout" data-test="logout-button">התנתק</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <form id="task-form" class="card task-form" novalidate data-test="task-form">
+        <input id="task-title" name="title" type="text" placeholder="מה צריך לעשות?" maxlength="100" data-test="task-title" aria-label="כותרת המשימה" />
+        <input id="task-due" name="due" type="date" data-test="task-due" aria-label="תאריך יעד" />
+        <select id="task-priority" name="priority" data-test="task-priority" aria-label="עדיפות">
+          <option value="low">עדיפות נמוכה</option>
+          <option value="medium" selected>עדיפות בינונית</option>
+          <option value="high">עדיפות גבוהה</option>
+        </select>
+        <button type="submit" class="btn primary" data-test="task-submit">הוסף</button>
+        <button type="button" class="btn ghost" id="task-cancel" data-test="task-cancel" hidden>ביטול</button>
+        <p class="field-error full" data-test="task-error"></p>
+      </form>
+
+      <div class="toolbar">
+        <div class="filters" role="tablist" data-test="filters">
+          <button type="button" class="filter active" data-filter="all" data-test="filter-all">הכל</button>
+          <button type="button" class="filter" data-filter="active" data-test="filter-active">פעילות</button>
+          <button type="button" class="filter" data-filter="done" data-test="filter-done">הושלמו</button>
+        </div>
+        <input id="search" type="search" placeholder="חיפוש משימה..." data-test="search" aria-label="חיפוש" />
+      </div>
+
+      <p class="counter" data-test="counter"></p>
+      <ul id="task-list" class="task-list" data-test="task-list"></ul>
+      <p class="empty" data-test="empty-state" hidden>אין משימות להצגה</p>
+    </main>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
