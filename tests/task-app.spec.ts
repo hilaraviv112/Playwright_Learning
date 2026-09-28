@@ -109,8 +109,12 @@ test.describe('Task App - משימות', () => {
     await items.first().locator(tid('task-toggle')).check();
     await expect(items.first()).toHaveClass(/done/);
 
-    page.once('dialog', (dialog) => dialog.accept());
     await items.first().locator(tid('task-delete')).click();
+    await items.first().locator(tid('task-delete-cancel')).click();
+    await expect(items).toHaveCount(1);
+
+    await items.first().locator(tid('task-delete')).click();
+    await items.first().locator(tid('task-delete-confirm')).click();
     await expect(items).toHaveCount(0);
     await expect(page.locator(tid('empty-state'))).toBeVisible();
   });

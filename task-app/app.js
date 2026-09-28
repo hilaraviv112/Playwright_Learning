@@ -9,12 +9,35 @@ const tasksKey = (email) => `tm_tasks_${email}`;
 
 const load = (key, fallback) => {
   try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    return JSON.parse(getItem(key)) ?? fallback;
   } catch {
     return fallback;
   }
 };
-const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+const save = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // אחסון חסום (למשל חלון פרטי) — הנתונים יישמרו רק עד רענון
+  }
+};
+const getItem = (key) => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+const setItem = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {}
+};
+const removeItem = (key) => {
+  try {
+    localStorage.removeItem(key);
+  } catch {}
+};
 
 async function hashPassword(password) {
   if (!window.crypto?.subtle) return password; // סביבה ללא Web Crypto
@@ -73,7 +96,7 @@ const views = {
 };
 
 const currentUser = () => {
-  const email = localStorage.getItem(SESSION_KEY);
+  const email = getItem(SESSION_KEY);
   return email ? load(USERS_KEY, []).find((u) => u.email === email) : null;
 };
 
@@ -84,7 +107,11 @@ function route() {
   if (user) view = 'tasks';
   else if (view !== 'register') view = 'login';
 
-  if (location.hash !== `#${view}`) history.replaceState(null, '', `#${view}`);
+  if (location.hash !== `#${view}`) {
+    try {
+      history.replaceState(null, '', `#${view}`);
+    } catch {}
+  }
   Object.entries(views).forEach(([name, el]) => (el.hidden = name !== view));
 
   if (view === 'tasks') initTasks(user);
@@ -118,7 +145,7 @@ loginForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  localStorage.setItem(SESSION_KEY, user.email);
+  setItem(SESSION_KEY, user.email);
   loginForm.reset();
   location.hash = '#tasks';
 });
@@ -167,7 +194,7 @@ registerForm.addEventListener('submit', async (e) => {
 
   users.push({ name, email, passwordHash: await hashPassword(password) });
   save(USERS_KEY, users);
-  localStorage.setItem(SESSION_KEY, email);
+  setItem(SESSION_KEY, email);
   registerForm.reset();
   updatePasswordRules('');
   location.hash = '#tasks';
@@ -179,7 +206,7 @@ document.querySelectorAll('.auth-card input').forEach((input) =>
 );
 
 document.getElementById('logout').addEventListener('click', () => {
-  localStorage.removeItem(SESSION_KEY);
+  removeItem(SESSION_KEY);
   location.hash = '#login';
 });
 
@@ -202,7 +229,7 @@ const filterButtons = document.querySelectorAll('.filter');
 const PRIORITY_LABELS = { high: 'גבוהה', medium: 'בינונית', low: 'נמוכה' };
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 
-const state = { user: null, tasks: [], filter: 'all', search: '', editingId: null };
+const state = { user: null, tasks: [], filter: 'all', search: '', editingId: null, confirmDeleteId: null };
 
 const todayISO = () => {
   const d = new Date();
@@ -365,14 +392,42 @@ function createTaskItem(task) {
   deleteBtn.dataset.test = 'task-delete';
   deleteBtn.textContent = 'מחיקה';
   deleteBtn.addEventListener('click', () => {
-    if (!confirm(`למחוק את המשימה "${task.title}"?`)) return;
-    state.tasks = state.tasks.filter((t) => t.id !== task.id);
-    if (state.editingId === task.id) resetTaskForm();
-    persistTasks();
+    state.confirmDeleteId = task.id;
     render();
   });
 
-  actions.append(editBtn, deleteBtn);
+  if (state.confirmDeleteId === task.id) {
+    const question = document.createElement('span');
+    question.className = 'confirm-text';
+    question.textContent = 'למחוק?';
+
+    const yesBtn = document.createElement('button');
+    yesBtn.type = 'button';
+    yesBtn.className = 'btn danger-solid';
+    yesBtn.dataset.test = 'task-delete-confirm';
+    yesBtn.textContent = 'כן, מחק';
+    yesBtn.addEventListener('click', () => {
+      state.tasks = state.tasks.filter((t) => t.id !== task.id);
+      state.confirmDeleteId = null;
+      if (state.editingId === task.id) resetTaskForm();
+      persistTasks();
+      render();
+    });
+
+    const noBtn = document.createElement('button');
+    noBtn.type = 'button';
+    noBtn.className = 'btn ghost';
+    noBtn.dataset.test = 'task-delete-cancel';
+    noBtn.textContent = 'ביטול';
+    noBtn.addEventListener('click', () => {
+      state.confirmDeleteId = null;
+      render();
+    });
+
+    actions.append(question, yesBtn, noBtn);
+  } else {
+    actions.append(editBtn, deleteBtn);
+  }
   li.append(checkbox, body, actions);
   return li;
 }
